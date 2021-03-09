@@ -1,5 +1,5 @@
 # channel
-Upcoming Nim channel implementation for ORC
+Upcoming Nim channel implementation for ORC(the development is moved to https://github.com/nim-lang/Nim/pull/17305)
 
 ## a motivate example
 ```nim
