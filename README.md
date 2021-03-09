@@ -34,11 +34,11 @@ proc spawnCrawlers =
   for t in mitems tasks:
     ch.send move t # or ch.send t.extract
 
-var thr2: Thread[void]
-createThread(thr2, worker)
+var thr: Thread[void]
+createThread(thr, worker)
 
 spawnCrawlers()
-joinThread(thr2)
+joinThread(thr)
 ```
 
 ## Useful materials
