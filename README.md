@@ -7,7 +7,7 @@ import channel
 import std/[httpclient, isolation, json]
 
 
-var ch = initChan[JsonNode]()
+var ch = initChan[JsonNode](kind = Spsc)
 
 
 proc download(client: HttpClient, url: string) =
@@ -16,17 +16,16 @@ proc download(client: HttpClient, url: string) =
   echo response.body[0 .. 20]
 
 
-proc worker {.thread.} =
+proc worker =
   var client = newHttpClient()
   var data: JsonNode
   ch.recv(data)
   if data != nil:
     for url in data["url"]:
+      echo url
       download(client, url.getStr)
   client.close()
 
-var thr: Thread[void]
-createThread(thr, worker)
 
 proc prepareTasks(fileWithUrls: string): seq[Isolated[JsonNode]] =
   result = @[]
