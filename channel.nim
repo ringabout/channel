@@ -14,9 +14,9 @@ const
   ChannelCacheSize* {.intdefine.} = 100
 
 type
-  ChannelBufKind = enum
-    Unbuffered # Unbuffered (blocking) channel
-    Buffered   # Buffered (non-blocking channel)
+  # ChannelBufKind = enum
+  #   Unbuffered # Unbuffered (blocking) channel
+  #   Buffered   # Buffered (non-blocking channel)
 
   ChannelKind* = enum
     Mpmc # Multiple producer, multiple consumer
@@ -82,8 +82,8 @@ template isEmptyUnbuf(chan: ChannelRaw): bool =
 # ChannelRaw kinds
 # ----------------------------------------------------------------------------------
 
-func isBuffered(chan: ChannelRaw): bool =
-  chan.size - 1 > 0
+# func isBuffered(chan: ChannelRaw): bool =
+#   chan.size - 1 > 0
 
 func isUnbuffered(chan: ChannelRaw): bool =
   assert chan.size >= 0
@@ -93,7 +93,7 @@ func isUnbuffered(chan: ChannelRaw): bool =
 # ----------------------------------------------------------------------------------
 
 proc isClosed(chan: ChannelRaw): bool {.inline.} = load(chan.closed, moRelaxed)
-proc capacity(chan: ChannelRaw): int32 {.inline.} = chan.size - 1
+# proc capacity(chan: ChannelRaw): int32 {.inline.} = chan.size - 1
 
 proc peek*(chan: ChannelRaw): int32 =
   (if chan.isUnbuffered(): numItemsUnbuf(chan) else: numItems(chan))
@@ -550,7 +550,7 @@ proc channel_open(chan: ChannelRaw): bool {.inline.} =
   ## (Re)open a channel
   open_fn[chan.impl](chan)
 
-# Weave API
+# Public API
 # ----------------------------------------------------------------------------------
 
 type
@@ -574,9 +574,10 @@ proc channel_receive[T](chan: Chan[T], data: ptr T, size: int32, nonBlocking: bo
 
 func trySend*[T](c: Chan[T], src: sink Isolated[T]): bool {.inline.} =
   var data = src.extract
-  channel_send(c, data, int32 sizeof(data), true)
+  result = channel_send(c, data, int32 sizeof(data), true)
   when defined(gcDestructors):
-    wasMoved(data)
+    if result:
+      wasMoved(data)
 
 func tryRecv*[T](c: Chan[T], dst: var T): bool {.inline.} =
   channel_receive(c, dst.addr, int32 sizeof(dst), true)
