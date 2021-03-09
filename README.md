@@ -22,7 +22,6 @@ proc worker =
   ch.recv(data)
   if data != nil:
     for url in data["url"]:
-      echo url
       download(client, url.getStr)
   client.close()
 
