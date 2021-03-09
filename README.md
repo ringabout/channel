@@ -15,7 +15,6 @@ proc download(client: HttpClient, url: string) =
   echo "content: "
   echo response.body[0 .. 20]
 
-
 proc worker =
   var client = newHttpClient()
   var data: JsonNode
@@ -25,7 +24,6 @@ proc worker =
       download(client, url.getStr)
   client.close()
 
-
 proc prepareTasks(fileWithUrls: string): seq[Isolated[JsonNode]] =
   result = @[]
   for line in lines(fileWithUrls):
@@ -34,8 +32,7 @@ proc prepareTasks(fileWithUrls: string): seq[Isolated[JsonNode]] =
 proc spawnCrawlers =
   var tasks = prepareTasks("todo_urls.txt")
   for t in mitems tasks:
-    ch.send move t
-
+    ch.send move t # or ch.send t.extract
 
 var thr2: Thread[void]
 createThread(thr2, worker)
@@ -43,3 +40,6 @@ createThread(thr2, worker)
 spawnCrawlers()
 joinThread(thr2)
 ```
+
+## Useful materials
+https://github.com/nim-lang/RFCs/issues/244
