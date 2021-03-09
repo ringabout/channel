@@ -588,10 +588,8 @@ func send*[T](c: Chan[T], src: sink Isolated[T]) {.inline.} =
   when defined(gcDestructors):
     wasMoved(data)
 
-proc send*[T](c: var Chan[T]; src: sink T) =
-  discard channel_send(c, src, int32 sizeof(src), false)
-  when defined(gcDestructors):
-    wasMoved(src)
+template send*[T](c: var Chan[T]; src: T) =
+   send(c, isolate(src))
 
 func recv*[T](c: Chan[T], dst: var T) {.inline.} =
   discard channel_receive(c, dst.addr, int32 sizeof(dst), false)
