@@ -606,10 +606,10 @@ func open*[T](c: Chan[T]): bool {.inline.} =
 func close*[T](c: Chan[T]): bool {.inline.} =
   result = c.d.channel_close()
 
-func peek*[T](c: Chan[T]): int32 = peek(c.d)
+func peek*[T](c: Chan[T]): int32 {.inline.} = peek(c.d)
 
-proc initChan*[T](elements = 30): Chan[T] =
-  result = Chan[T](d: allocChannel(int32 sizeof(T), elements.int32, Mpmc))
+proc initChan*[T](elements = 30, kind = Mpmc): Chan[T] =
+  result = Chan[T](d: allocChannel(int32 sizeof(T), elements.int32, kind))
 
-proc delete*[T](c: var Chan[T]) =
+proc delete*[T](c: var Chan[T]) {.inline.} =
   freeChannel(c.d)
